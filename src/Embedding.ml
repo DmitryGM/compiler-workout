@@ -27,6 +27,7 @@ let ( != ) = binop "!="
 let ( && ) = binop "&&"
 let ( || ) = binop "!!"
 
+(*
 (* Some predefined names for variables *)
 let x = !"x"
 let y = !"y"
@@ -37,4 +38,4 @@ let t = !"t"
 let _ =
   List.iter (fun e -> Printf.printf "eval s (%s) = %d\n" (show(expr) e) (eval s e)) [x+y*z- !?3; t-z+y && x]
 
-                   
+*)
