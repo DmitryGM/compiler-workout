@@ -91,7 +91,22 @@ module Stmt =
           val eval : config -> t -> config
 
        Takes a configuration and a statement, and returns another configuration
-    *)
     let eval _ = failwith "Not implemented yet"
+    *)
+    
+    let get_1 (a,b,c) = a ;;
+    let get_2 (a,b,c) = b ;;
+    let get_3 (a,b,c) = c ;;
+    
+    let rec eval conf statement =
+        let state = get_1 conf in
+        let input = get_2 conf in
+        let output = get_3 conf in
+        match statement with
+        | Assign (x, e) -> ((Expr.update x (Expr.eval state e) state), input, output)
+        | Read    x     -> let h::t = input in ((Expr.update x h state), t, output)
+        | Write   e     -> (state, input, output@[(Expr.eval state e)])
+        | Seq  (s1, s2) -> eval (eval conf s1) s2
+        ;;
                                                          
   end
