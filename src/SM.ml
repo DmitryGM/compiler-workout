@@ -73,6 +73,33 @@ let run i p = let (_, (_, _, o)) = eval ([], (Syntax.Expr.empty, i, [])) p in o
 
    Takes a program in the source language and returns an equivalent program for the
    stack machine
- *)
 
 let compile _ = failwith "Not yet implemented"
+*)
+
+let rec compile_expr state expr =
+    match expr with
+    | Syntax.Expr.Const c -> [CONST c]
+    | Syntax.Expr.Var x   -> [LD x]
+    | Syntax.Expr.Binop (op, v1, v2) -> (compile_expr state v1) @ (compile_expr state v2) @ [BINOP op]
+
+let get_1 (a,_,_) = a ;;
+let get_2 (_,a,_) = a ;;
+let get_3 (_,_,a) = a ;; 
+
+let rec compile prog =
+    let config = (Syntax.Expr.empty,[],[]) in
+    let state = get_1 config in
+    let input = get_2 config in
+    let output = get_3 config in
+    match prog with
+    | Syntax.Stmt.Assign (x, e) -> (compile_expr state e)@[ST x]
+    | Syntax.Stmt.Read x     -> [READ; ST x]
+    | Syntax.Stmt.Write e    -> (compile_expr state e)@[WRITE]
+    | Syntax.Stmt.Seq (s1, s2)  -> (compile s1) @ (compile s2)
+;;
+
+
+
+
+
