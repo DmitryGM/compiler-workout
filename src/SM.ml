@@ -22,8 +22,42 @@ type config = int list * Syntax.Stmt.config
      val eval : config -> prg -> config
 
    Takes a configuration and a program, and returns a configuration as a result
- *)                         
 let eval _ = failwith "Not yet implemented"
+ *)
+
+let get_1 (a,_) = a ;;
+let get_2 (_,a) = a ;;
+
+let rec eval config prg =
+    let stack = get_1 config in
+    let stmt_conf = get_2 config in
+    let state = Syntax.Stmt.get_1 stmt_conf in
+    let input = Syntax.Stmt.get_2 stmt_conf in
+    let output = Syntax.Stmt.get_3 stmt_conf in
+    if List.length prg = 0 then
+        config
+    else
+        let insn::p = prg in
+        match insn with
+        | BINOP op -> 
+            let y::x::st = stack in
+            eval ([(Syntax.Expr.eval_op op x y)]@st, stmt_conf) p
+        
+        | CONST i -> eval ([i]@stack, stmt_conf) p
+
+        | READ    -> 
+            let h::t = input in
+            eval ([h]@stack, (state, t, output)) p
+
+        | WRITE   ->
+            let h::st = stack in
+            eval (st, (state, input, output@[h])) p
+
+        | LD x    -> eval ([(state x)]@stack, (state, input, output)) p
+
+        | ST x    ->
+            let h::st = stack in
+            eval (st, ((Syntax.Expr.update x h state), input, output)) p
 
 (* Top-level evaluation
 
