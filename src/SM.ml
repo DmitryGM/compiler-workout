@@ -25,15 +25,9 @@ type config = int list * Syntax.Stmt.config
 let eval _ = failwith "Not yet implemented"
  *)
 
-let get_1 (a,_) = a ;;
-let get_2 (_,a) = a ;;
-
 let rec eval config prg =
-    let stack = get_1 config in
-    let stmt_conf = get_2 config in
-    let state = Syntax.Stmt.get_1 stmt_conf in
-    let input = Syntax.Stmt.get_2 stmt_conf in
-    let output = Syntax.Stmt.get_3 stmt_conf in
+    let (stack, stmt_conf) = config in
+    let (state, input, output) = stmt_conf in
     if List.length prg = 0 then
         config
     else
@@ -83,15 +77,9 @@ let rec compile_expr state expr =
     | Syntax.Expr.Var x   -> [LD x]
     | Syntax.Expr.Binop (op, v1, v2) -> (compile_expr state v1) @ (compile_expr state v2) @ [BINOP op]
 
-let get_1 (a,_,_) = a ;;
-let get_2 (_,a,_) = a ;;
-let get_3 (_,_,a) = a ;; 
-
 let rec compile prog =
     let config = (Syntax.Expr.empty,[],[]) in
-    let state = get_1 config in
-    let input = get_2 config in
-    let output = get_3 config in
+    let (state, input, output) = config in
     match prog with
     | Syntax.Stmt.Assign (x, e) -> (compile_expr state e)@[ST x]
     | Syntax.Stmt.Read x     -> [READ; ST x]
