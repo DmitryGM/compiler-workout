@@ -36,7 +36,7 @@ let rec eval config prg =
         match insn with
         | BINOP op -> 
             let y::x::st = stack in
-            eval ([(Syntax.Expr.eval_op op x y)]@st, stmt_conf) p
+            eval ([(Expr.eval_op op x y)]@st, stmt_conf) p
         
         | CONST i -> eval ([i]@stack, stmt_conf) p
 
@@ -52,7 +52,7 @@ let rec eval config prg =
 
         | ST x    ->
             let h::st = stack in
-            eval (st, ((Syntax.Expr.update x h state), input, output)) p
+            eval (st, ((Expr.update x h state), input, output)) p
 
 (* Top-level evaluation
 
@@ -60,7 +60,7 @@ let rec eval config prg =
 
    Takes an input stream, a program, and returns an output stream this program calculates
 *)
-let run i p = let (_, (_, _, o)) = eval ([], (Syntax.Expr.empty, i, [])) p in o
+let run i p = let (_, (_, _, o)) = eval ([], (Expr.empty, i, [])) p in o
 
 (* Top-level evaluation
 
@@ -82,17 +82,17 @@ let compile _ = failwith "Not yet implemented"
 
 let rec compile_expr state expr =
     match expr with
-    | Syntax.Expr.Const c -> [CONST c]
-    | Syntax.Expr.Var x   -> [LD x]
-    | Syntax.Expr.Binop (op, v1, v2) -> (compile_expr state v1) @ (compile_expr state v2) @ [BINOP op]
+    | Expr.Const c -> [CONST c]
+    | Expr.Var x   -> [LD x]
+    | Expr.Binop (op, v1, v2) -> (compile_expr state v1) @ (compile_expr state v2) @ [BINOP op]
 
 let rec compile prog =
-    let config = (Syntax.Expr.empty,[],[]) in
+    let config = (Expr.empty,[],[]) in
     let (state, input, output) = config in
     match prog with
-    | Syntax.Stmt.Assign (x, e) -> (compile_expr state e)@[ST x]
-    | Syntax.Stmt.Read x     -> [READ; ST x]
-    | Syntax.Stmt.Write e    -> (compile_expr state e)@[WRITE]
-    | Syntax.Stmt.Seq (s1, s2)  -> (compile s1) @ (compile s2)
+    | Stmt.Assign (x, e) -> (compile_expr state e)@[ST x]
+    | Stmt.Read x     -> [READ; ST x]
+    | Stmt.Write e    -> (compile_expr state e)@[WRITE]
+    | Stmt.Seq (s1, s2)  -> (compile s1) @ (compile s2)
 ;;
 
