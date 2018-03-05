@@ -76,7 +76,6 @@ let run p i = let (_, (_, _, o)) = eval ([], (Expr.empty, i, [])) p in o
 
    Takes a program in the source language and returns an equivalent program for the
    stack machine
-<<<<<<< HEAD
 
 let compile _ = failwith "Not yet implemented"
 *)
@@ -97,13 +96,3 @@ let rec compile prog =
     | Syntax.Stmt.Seq (s1, s2)  -> (compile s1) @ (compile s2)
 ;;
 
-
-
-
-
-=======
- *)
-let compile _ = failwith "Not yet implemented"
-
-                         
->>>>>>> 6b9953b41f3d691f61e3d07e88076da908fd6a74
