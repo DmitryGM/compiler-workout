@@ -1,4 +1,5 @@
 open GT       
+open Language
        
 (* The type for the stack machine instructions *)
 @type insn =
@@ -15,7 +16,7 @@ type prg = insn list
 (* The type for the stack machine configuration: a stack and a configuration from statement
    interpreter
  *)
-type config = int list * Syntax.Stmt.config
+type config = int list * Stmt.config
 
 (* Stack machine interpreter
 
@@ -61,12 +62,21 @@ let rec eval config prg =
 *)
 let run i p = let (_, (_, _, o)) = eval ([], (Syntax.Expr.empty, i, [])) p in o
 
+(* Top-level evaluation
+
+     val run : prg -> int list -> int list
+
+   Takes an input stream, a program, and returns an output stream this program calculates
+*)
+let run p i = let (_, (_, _, o)) = eval ([], (Expr.empty, i, [])) p in o
+
 (* Stack machine compiler
 
-     val compile : Syntax.Stmt.t -> prg
+     val compile : Language.Stmt.t -> prg
 
    Takes a program in the source language and returns an equivalent program for the
    stack machine
+<<<<<<< HEAD
 
 let compile _ = failwith "Not yet implemented"
 *)
@@ -91,3 +101,9 @@ let rec compile prog =
 
 
 
+=======
+ *)
+let compile _ = failwith "Not yet implemented"
+
+                         
+>>>>>>> 6b9953b41f3d691f61e3d07e88076da908fd6a74
