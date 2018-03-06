@@ -78,8 +78,31 @@ module Expr =
          DECIMAL --- a decimal constant [0-9]+ as a string
    
     *)
+
+    let mapper ops =
+        List.map (
+            fun op -> ostap ($(op)),
+            fun x y -> Binop (op, x, y)
+        ) ops
+    ;;
+        
     ostap (
-      parse: empty {failwith "Not implemented yet"}
+    parse: expr;
+    expr:
+    !(Ostap.Util.expr
+      (fun x -> x)
+      [|
+        `Lefta, mapper ["!!"];
+        `Lefta, mapper ["&&"];
+        `Nona,  mapper ["<="; ">="; "<"; ">"; "=="; "!="];
+        `Lefta, mapper ["+"; "-"];
+        `Lefta, mapper ["*"; "/"; "%"]
+      |]
+      primary
+    );
+
+    primary:
+        s:IDENT {Var s} | d:DECIMAL {Const d} | -"(" parse -")"
     )
 
   end
@@ -115,9 +138,24 @@ module Stmt =
 
     (* Statement parser *)
     ostap (
-      parse: empty {failwith "Not implemented yet"}
+        parse   : seq | stmt;
+    
+        seq     : l:stmt -";" r:parse {Seq (l,r)};
+
+        stmt    :   -"read" -"(" s: IDENT -")" {Read (s)}           |
+                    -"write" -"(" e: !(Expr.parse) -")" {Write (e)} |
+                    s: IDENT -":=" e: !(Expr.parse) {Assign (s, e)}
     )
-      
+(*
+    ostap (
+    parse: seq | stmt;
+    stmt:
+        -"read" -"(" s: IDENT -")" {Read s}
+        | -"write" -"(" e: !(Expr.parse) -")" {Write e}
+        | s: IDENT -":=" e: !(Expr.parse) { Assign (s, e) };
+    seq: left:stmt -";" right:parse { Seq (left, right) }
+     ) 
+*)
   end
 
 (* The top-level definitions *)
